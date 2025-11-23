@@ -401,13 +401,13 @@ MIT License - See LICENSE file for details
 
 ## Contact
 
-**Project Lead**: Madusanka (CEO, Knovik)
-**Company**: Knovik Private Limited
+**Project Lead**: Madusanka Premaratne
+**Company**: Knivok Private Limited
 **Location**: Sri Lanka
 
 For questions about the research paper or implementation:
-- Email: [contact@knovik.lk]
-- GitHub Issues: https://github.com/knovik/skillvault/issues
+- Email: [rmmpremaratne@gmail.com]
+- GitHub Issues: https://github.com/madusankapremaratne/skillvault-kotlin/issues
 
 ---
 
