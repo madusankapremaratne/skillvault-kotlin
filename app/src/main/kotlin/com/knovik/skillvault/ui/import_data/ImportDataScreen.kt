@@ -102,7 +102,7 @@ fun ImportDataScreen(
                     uiState = uiState
                 )
                 1 -> FileImportContent(
-                    onSelectFile = { filePickerLauncher.launch("text/csv") },
+                    onSelectFile = { filePickerLauncher.launch("*/*") },
                     uiState = uiState
                 )
             }
