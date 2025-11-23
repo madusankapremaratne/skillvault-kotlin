@@ -39,25 +39,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Resume Detail Activity -->
-        <activity
-            android:name=".ui.detail.ResumeDetailActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.MainActivity" />
-
-        <!-- Search Activity -->
-        <activity
-            android:name=".ui.search.SearchActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="stateAlwaysVisible" />
-
-        <!-- Data Import Activity -->
-        <activity
-            android:name=".ui.import_data.ImportDataActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.MainActivity" />
-
         <!-- Background Service for Ingestion -->
         <service
             android:name=".service.EmbeddingIngestionService"

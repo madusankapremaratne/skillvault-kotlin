@@ -2,6 +2,7 @@ package com.knovik.skillvault.domain.vector_search
 
 import com.knovik.skillvault.data.entity.ResumeEmbedding
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.floats.shouldBeGreaterThan
 import io.kotest.matchers.floats.shouldBeLessThan
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -184,6 +185,7 @@ class VectorSearchEngineTest : FreeSpec({
                 val (results, metrics) = searchEngine.searchWithMetrics(query, candidates, topK = 10)
                 
                 metrics.executionTimeMs.shouldBeLessThan(500L) // Should complete in <500ms
+                //shouldBeLessThan(500L) // Should complete in <500ms
                 results.size.shouldBeGreaterThan(0)
             }
         }
