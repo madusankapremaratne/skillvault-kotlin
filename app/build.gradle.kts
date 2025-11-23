@@ -98,6 +98,7 @@ dependencies {
     // Dependency Injection - Hilt
     implementation("com.google.dagger:hilt-android:${rootProject.ext.get("hilt_version")}")
     kapt("com.google.dagger:hilt-compiler:${rootProject.ext.get("hilt_version")}")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     
     // Networking
     implementation("com.squareup.retrofit2:retrofit:${rootProject.ext.get("retrofit_version")}")
