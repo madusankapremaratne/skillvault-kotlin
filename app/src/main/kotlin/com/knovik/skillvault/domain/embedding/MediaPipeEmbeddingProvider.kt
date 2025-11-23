@@ -25,7 +25,7 @@ class MediaPipeEmbeddingProvider @Inject constructor(
 
     companion object {
         private const val MODEL_ASSET_PATH = "text_embedder.tflite"
-        private const val EMBEDDING_DIMENSION = 384
+        private const val EMBEDDING_DIMENSION = 512
     }
 
     /**

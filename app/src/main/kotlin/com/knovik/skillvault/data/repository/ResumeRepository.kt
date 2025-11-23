@@ -224,8 +224,8 @@ class ResumeRepository @Inject constructor(
         val allResumes = resumeBox.all
         val totalTextSize = allResumes.sumOf { it.rawText.length.toLong() }
         
-        // Each embedding: 384 floats * 4 bytes = 1536 bytes
-        val embeddingStorageSize = embeddingCount * 1536
+        // Each embedding: 512 floats * 4 bytes = 2048 bytes
+        val embeddingStorageSize = embeddingCount * 2048
         
         mapOf(
             "resumeCount" to resumeCount,

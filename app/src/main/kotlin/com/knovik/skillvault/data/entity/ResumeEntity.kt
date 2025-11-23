@@ -66,12 +66,12 @@ data class ResumeEmbedding(
     var segmentType: String = "", // "summary", "experience", "education", "skills", "certifications"
     var segmentText: String = "", // Original text segment
     
-    // Vector embedding (384 dimensions for MobileBERT-based embeddings)
-    var embedding: FloatArray = FloatArray(384),
-    
+    // Vector embedding (512 dimensions for Universal Sentence Encoder)
+    var embedding: FloatArray = FloatArray(512),
+
     // Metadata
-    var embeddingModel: String = "google-mediapipe-text-v1",
-    var embeddingDimension: Int = 384,
+    var embeddingModel: String = "google-mediapipe-use-v1",
+    var embeddingDimension: Int = 512,
     
     // Timestamps
     var createdAt: Long = System.currentTimeMillis(),
@@ -109,7 +109,7 @@ data class SearchQuery(
     
     @Index
     var queryText: String = "",
-    var queryEmbedding: FloatArray = FloatArray(384),
+    var queryEmbedding: FloatArray = FloatArray(512),
     
     var executedAt: Long = System.currentTimeMillis(),
     var executionTimeMs: Long = 0,
