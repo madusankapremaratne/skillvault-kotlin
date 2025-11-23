@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,7 +18,8 @@ import com.knovik.skillvault.data.entity.Resume
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResumeListScreen(
-    viewModel: ResumeListViewModel = hiltViewModel()
+    viewModel: ResumeListViewModel = hiltViewModel(),
+    onNavigateToImport: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val resumeCount by viewModel.resumeCount.collectAsState()
@@ -32,6 +34,17 @@ fun ResumeListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToImport,
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Import CSV"
+                )
+            }
         }
     ) { paddingValues ->
         Column(

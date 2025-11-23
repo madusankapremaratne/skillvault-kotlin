@@ -19,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.knovik.skillvault.ui.resume_list.ResumeListScreen
 import com.knovik.skillvault.ui.search.SearchScreen
+import com.knovik.skillvault.ui.import_data.ImportDataScreen
 import com.knovik.skillvault.ui.theme.SkillVaultTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object ResumeList : Screen("resume_list", "Resumes", Icons.Filled.Home)
     data object Search : Screen("search", "Search", Icons.Filled.Search)
+    data object ImportData : Screen("import_data", "Import", Icons.Filled.Home)
 }
 
 /**
@@ -90,10 +92,20 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.ResumeList.route) {
-                ResumeListScreen()
+                ResumeListScreen(
+                    onNavigateToImport = {
+                        navController.navigate(Screen.ImportData.route)
+                    }
+                )
             }
             composable(Screen.Search.route) {
                 SearchScreen()
+            }
+            composable(Screen.ImportData.route) {
+                ImportDataScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onImportSuccess = { navController.popBackStack() }
+                )
             }
         }
     }

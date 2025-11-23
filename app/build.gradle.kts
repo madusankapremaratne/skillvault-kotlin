@@ -110,6 +110,9 @@ dependencies {
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${rootProject.ext.get("moshi_version")}")
     implementation("com.google.code.gson:gson:${rootProject.ext.get("gson_version")}")
     
+    // CSV Parsing
+    implementation("com.opencsv:opencsv:5.9")
+    
     // MediaPipe - On-Device ML (Text Embeddings)
     implementation("com.google.mediapipe:tasks-text:${rootProject.ext.get("mediapipe_version")}")
     

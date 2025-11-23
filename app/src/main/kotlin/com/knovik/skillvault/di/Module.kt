@@ -76,6 +76,31 @@ object DataModule {
     fun providePerformanceMetricBox(boxStore: BoxStore): Box<PerformanceMetric> {
         return boxStore.boxFor()
     }
+
+    /**
+     * Provide OkHttpClient for network operations.
+     */
+    @Singleton
+    @Provides
+    fun provideOkHttpClient(): okhttp3.OkHttpClient {
+        return okhttp3.OkHttpClient.Builder()
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+    }
+
+    /**
+     * Provide ResumeCSVImporter for CSV import operations.
+     */
+    @Singleton
+    @Provides
+    fun provideResumeCSVImporter(
+        @ApplicationContext context: Context,
+        okHttpClient: okhttp3.OkHttpClient
+    ): com.knovik.skillvault.data.importer.ResumeCSVImporter {
+        return com.knovik.skillvault.data.importer.ResumeCSVImporter(context, okHttpClient)
+    }
 }
 
 /**
