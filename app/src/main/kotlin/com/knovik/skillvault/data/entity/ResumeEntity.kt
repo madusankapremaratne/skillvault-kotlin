@@ -77,8 +77,8 @@ data class ResumeEmbedding(
     var createdAt: Long = System.currentTimeMillis(),
     
     // Quality metrics
-    var confidenceScore: Float = 0f, // 0-1, how confident in this embedding
-    
+    var confidenceScore: Float = 0f // 0-1, how confident in this embedding
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -96,7 +96,7 @@ data class ResumeEmbedding(
         result = 31 * result + embedding.contentHashCode()
         return result
     }
-)
+}
 
 /**
  * Represents a search query with its embedding and results.
@@ -120,8 +120,8 @@ data class SearchQuery(
     
     // User interaction
     var wasUserSatisfied: Boolean = false,
-    var feedbackText: String = "",
-    
+    var feedbackText: String = ""
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -139,7 +139,7 @@ data class SearchQuery(
         result = 31 * result + queryEmbedding.contentHashCode()
         return result
     }
-)
+}
 
 /**
  * Represents performance metrics for benchmarking.

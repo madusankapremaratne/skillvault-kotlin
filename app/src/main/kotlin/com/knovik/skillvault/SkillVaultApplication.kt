@@ -1,6 +1,8 @@
 package com.knovik.skillvault
 
 import android.app.Application
+import com.knovik.skillvault.data.entity.ResumeEmbedding_
+import com.knovik.skillvault.data.entity.SearchQuery_
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -40,7 +42,7 @@ class SkillVaultApplication : Application() {
      */
     private class CrashReportingTree : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            if (priority >= Timber.ERROR) {
+            if (priority >= android.util.Log.ERROR) {
                 // Send to crash reporting service
                 // Crashlytics.crashlyticsKit.recordException(t)
                 super.log(priority, tag, message, t)

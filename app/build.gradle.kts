@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
     id("io.objectbox")
 }
 
@@ -52,6 +52,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     
     composeOptions {
@@ -109,7 +110,7 @@ dependencies {
     implementation("com.google.code.gson:gson:${rootProject.ext.get("gson_version")}")
     
     // MediaPipe - On-Device ML (Text Embeddings)
-    implementation("com.google.mediapipe:mediapipe-tasks-text:${rootProject.ext.get("mediapipe_version")}")
+    implementation("com.google.mediapipe:tasks-text:${rootProject.ext.get("mediapipe_version")}")
     
     // Logging
     implementation("com.jakewharton.timber:timber:${rootProject.ext.get("timber_version")}")
@@ -128,6 +129,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:${rootProject.ext.get("espresso_version")}")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:${rootProject.ext.get("compose_version")}")
     androidTestDebugImplementation("androidx.compose.ui:ui-test-manifest:${rootProject.ext.get("compose_version")}")
+    
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }
 
 // Hilt plugin configuration

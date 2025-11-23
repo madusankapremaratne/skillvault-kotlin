@@ -20,6 +20,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import androidx.work.ListenableWorker
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 /**
@@ -60,7 +62,7 @@ class EmbeddingIngestionService : Service() {
      */
     fun scheduleIngestionWork() {
         val ingestionWork = OneTimeWorkRequestBuilder<EmbeddingIngestionWorker>()
-            .setBackoffPolicy(
+            .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
                 1, TimeUnit.MINUTES
             )
@@ -69,7 +71,7 @@ class EmbeddingIngestionService : Service() {
         WorkManager.getInstance(applicationContext).enqueueUniqueWork(
             "embedding_ingestion",
             androidx.work.ExistingWorkPolicy.KEEP,
-            ingestionWork
+            ingestionWork as androidx.work.OneTimeWorkRequest
         )
 
         Timber.d("Embedding ingestion work scheduled")
@@ -104,7 +106,7 @@ class EmbeddingIngestionService : Service() {
                     resumeRepository.getResume(resumeId)?.copy(
                         processingStatus = "failed",
                         errorMessage = e.message ?: "Unknown error"
-                    )
+                    ) ?: return@launch
                 )
             }
         }
@@ -191,7 +193,7 @@ class EmbeddingIngestionWorker(
     @Inject lateinit var resumeRepository: ResumeRepository
     @Inject lateinit var embeddingProvider: MediaPipeEmbeddingProvider
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): ListenableWorker.Result {
         return try {
             Timber.d("EmbeddingIngestionWorker started")
 
@@ -199,14 +201,14 @@ class EmbeddingIngestionWorker(
             val initResult = embeddingProvider.initialize()
             if (initResult.isFailure) {
                 Timber.e("Failed to initialize embedding provider")
-                return Result.retry()
+                return ListenableWorker.Result.retry()
             }
 
             // Get unembedded resumes
             val unembeddedResumes = resumeRepository.getUnembeddedResumes(limit = 100)
             if (unembeddedResumes.isEmpty()) {
                 Timber.d("No unembedded resumes found")
-                return Result.success()
+                return ListenableWorker.Result.success()
             }
 
             Timber.d("Processing ${unembeddedResumes.size} unembedded resumes")
@@ -234,10 +236,10 @@ class EmbeddingIngestionWorker(
             }
 
             Timber.d("EmbeddingIngestionWorker completed")
-            Result.success()
+            return ListenableWorker.Result.success()
         } catch (e: Exception) {
             Timber.e(e, "EmbeddingIngestionWorker failed")
-            Result.retry()
+            return ListenableWorker.Result.retry()
         }
     }
 

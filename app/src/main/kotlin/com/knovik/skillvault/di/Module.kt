@@ -4,9 +4,11 @@ import android.content.Context
 import com.knovik.skillvault.data.entity.Resume
 import com.knovik.skillvault.data.entity.ResumeEmbedding
 import com.knovik.skillvault.data.entity.SearchQuery
+import com.knovik.skillvault.data.entity.PerformanceMetric
 import io.objectbox.Box
 import io.objectbox.BoxStore
-import io.objectbox.ObjectBox
+import com.knovik.skillvault.data.entity.MyObjectBox
+
 import io.objectbox.kotlin.boxFor
 import dagger.Module
 import dagger.Provides
@@ -31,11 +33,11 @@ object DataModule {
     @Singleton
     @Provides
     fun provideBoxStore(@ApplicationContext context: Context): BoxStore {
-        val boxStore = ObjectBox.builder()
+        val boxStore = MyObjectBox.builder()
             .androidContext(context)
             .build()
         
-        Timber.d("ObjectBox initialized at: ${boxStore.dbFile}")
+        Timber.d("ObjectBox initialized: $boxStore")
         return boxStore
     }
 
@@ -65,6 +67,15 @@ object DataModule {
     fun provideSearchQueryBox(boxStore: BoxStore): Box<SearchQuery> {
         return boxStore.boxFor()
     }
+
+    /**
+     * Provide Box<PerformanceMetric> for benchmarking.
+     */
+    @Singleton
+    @Provides
+    fun providePerformanceMetricBox(boxStore: BoxStore): Box<PerformanceMetric> {
+        return boxStore.boxFor()
+    }
 }
 
 /**
@@ -90,21 +101,4 @@ object UIModule {
     // ViewModels are provided via ViewModelFactory or directly through HiltViewModel annotation
 }
 
-/**
- * Provides logging setup for Timber.
- */
-@Module
-@InstallIn(SingletonComponent::class)
-object LoggingModule {
 
-    @Singleton
-    @Provides
-    fun provideTimberTree(): Unit {
-        if (!::isTimberInitialized.isInitialized) {
-            Timber.plant(Timber.DebugTree())
-            isTimberInitialized = true
-        }
-    }
-
-    private lateinit var isTimberInitialized: Boolean
-}

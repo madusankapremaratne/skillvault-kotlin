@@ -64,8 +64,7 @@ class BenchmarkingUtil @Inject constructor(
         val usedMemory = totalMemory - freeMemory
         val maxMemory = runtime.maxMemory()
 
-        val nativeHeap = Debug.getNativeHeap()
-        val nativeHeapSize = nativeHeap.sumOf { it.size }
+        val nativeHeapSize = Debug.getNativeHeapAllocatedSize()
 
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
         val memInfo = ActivityManager.MemoryInfo()
@@ -91,8 +90,8 @@ class BenchmarkingUtil @Inject constructor(
 
             val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
             val capacity = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)
-            val voltage = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_VOLTAGE)
-            val temperature = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_TEMPERATURE)
+            val voltage = 0 // Voltage requires broadcast receiver
+            val temperature = 0 // Temperature requires broadcast receiver
             val status = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
 
             return BatteryStats(

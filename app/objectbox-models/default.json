@@ -1,0 +1,356 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3879952311209908640",
+      "lastPropertyId": "8:8579108620656823494",
+      "name": "CareerEntry",
+      "properties": [
+        {
+          "id": "1:2036880067789097999",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6494813774538099431",
+          "name": "userId",
+          "type": 9
+        },
+        {
+          "id": "3:129068953909654162",
+          "name": "timestamp",
+          "type": 6
+        },
+        {
+          "id": "4:6017992358008636785",
+          "name": "entryType",
+          "type": 9
+        },
+        {
+          "id": "5:1545050507035640565",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "6:2808680427025299264",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "7:2620739843890826806",
+          "name": "relevantSkills",
+          "type": 9
+        },
+        {
+          "id": "8:8579108620656823494",
+          "name": "createdAt",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:4055476254889062419",
+      "lastPropertyId": "9:7092764599489667545",
+      "name": "PerformanceMetric",
+      "properties": [
+        {
+          "id": "1:1344795506765439213",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1786092297734902692",
+          "name": "metricType",
+          "indexId": "1:2485930308883969923",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:6711880040652861704",
+          "name": "metricName",
+          "type": 9
+        },
+        {
+          "id": "4:3938511334167435999",
+          "name": "value",
+          "type": 8
+        },
+        {
+          "id": "5:8881076244692839274",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "6:2190973675238701293",
+          "name": "resumeCount",
+          "type": 5
+        },
+        {
+          "id": "7:7971321386540703056",
+          "name": "embeddingCount",
+          "type": 5
+        },
+        {
+          "id": "8:2869285836188675967",
+          "name": "timestamp",
+          "type": 6
+        },
+        {
+          "id": "9:7092764599489667545",
+          "name": "deviceInfo",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:4745040415549084472",
+      "lastPropertyId": "21:2682769419137912700",
+      "name": "Resume",
+      "properties": [
+        {
+          "id": "1:5401873728800046413",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1816593286338358884",
+          "name": "resumeId",
+          "indexId": "2:3812594220419331528",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:149363148688278690",
+          "name": "fullName",
+          "type": 9
+        },
+        {
+          "id": "4:55081396308817641",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "5:8184215785671903671",
+          "name": "phoneNumber",
+          "type": 9
+        },
+        {
+          "id": "6:7991262780550254011",
+          "name": "rawText",
+          "type": 9
+        },
+        {
+          "id": "7:4243965926652400967",
+          "name": "summary",
+          "type": 9
+        },
+        {
+          "id": "8:76922986514853946",
+          "name": "skills",
+          "type": 9
+        },
+        {
+          "id": "9:6979825022406687597",
+          "name": "experience",
+          "type": 9
+        },
+        {
+          "id": "10:692294862381595203",
+          "name": "education",
+          "type": 9
+        },
+        {
+          "id": "11:4584159339213891132",
+          "name": "certifications",
+          "type": 9
+        },
+        {
+          "id": "12:2907009042001461845",
+          "name": "sourceFile",
+          "type": 9
+        },
+        {
+          "id": "13:3919902335733627096",
+          "name": "fileFormat",
+          "type": 9
+        },
+        {
+          "id": "14:4020973684964904404",
+          "name": "fileSize",
+          "type": 6
+        },
+        {
+          "id": "15:949395210197094793",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "16:1346739920557691220",
+          "name": "updatedAt",
+          "type": 6
+        },
+        {
+          "id": "17:4566390324515258033",
+          "name": "embeddedAt",
+          "type": 6
+        },
+        {
+          "id": "18:2124833730565206123",
+          "name": "isEmbedded",
+          "type": 1
+        },
+        {
+          "id": "19:2810541994100958088",
+          "name": "processingStatus",
+          "type": 9
+        },
+        {
+          "id": "20:5335728969709266203",
+          "name": "errorMessage",
+          "type": 9
+        },
+        {
+          "id": "21:2682769419137912700",
+          "name": "textHash",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:2967802969182954806",
+      "lastPropertyId": "10:906459263825998536",
+      "name": "ResumeEmbedding",
+      "properties": [
+        {
+          "id": "1:404295818816544704",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6554159131024147351",
+          "name": "resumeId",
+          "indexId": "3:22033187459144502",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:4589033219285142677",
+          "name": "segmentId",
+          "type": 9
+        },
+        {
+          "id": "4:4054036638436976149",
+          "name": "segmentType",
+          "type": 9
+        },
+        {
+          "id": "5:6764833497670477771",
+          "name": "segmentText",
+          "type": 9
+        },
+        {
+          "id": "6:8993313106965904870",
+          "name": "embedding",
+          "type": 28
+        },
+        {
+          "id": "7:5836696205464069739",
+          "name": "embeddingModel",
+          "type": 9
+        },
+        {
+          "id": "8:1122168115516498203",
+          "name": "embeddingDimension",
+          "type": 5
+        },
+        {
+          "id": "9:3679587296763366306",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "10:906459263825998536",
+          "name": "confidenceScore",
+          "type": 7
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:2262736522436445208",
+      "lastPropertyId": "9:2258107064293669777",
+      "name": "SearchQuery",
+      "properties": [
+        {
+          "id": "1:2854044765065859840",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:3594738933071345023",
+          "name": "queryText",
+          "indexId": "4:2987950820128288717",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:8581883712192345464",
+          "name": "queryEmbedding",
+          "type": 28
+        },
+        {
+          "id": "4:495146695833706401",
+          "name": "executedAt",
+          "type": 6
+        },
+        {
+          "id": "5:218874700631280486",
+          "name": "executionTimeMs",
+          "type": 6
+        },
+        {
+          "id": "6:8024305156953175696",
+          "name": "resultCount",
+          "type": 5
+        },
+        {
+          "id": "7:713234488273268657",
+          "name": "topScoreValue",
+          "type": 7
+        },
+        {
+          "id": "8:3655510469349578199",
+          "name": "wasUserSatisfied",
+          "type": 1
+        },
+        {
+          "id": "9:2258107064293669777",
+          "name": "feedbackText",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "5:2262736522436445208",
+  "lastIndexId": "4:2987950820128288717",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

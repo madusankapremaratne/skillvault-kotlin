@@ -1,15 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") version "8.2.0" apply false
-    id("com.android.library") version "8.2.0" apply false
+    id("com.android.application") version "8.7.1" apply false
+    id("com.android.library") version "8.7.1" apply false
     kotlin("android") version "1.9.20" apply false
     kotlin("kapt") version "1.9.20" apply false
-    id("io.objectbox") version "4.1.0" apply false
+    id("io.objectbox") version "5.0.1" apply false
+    id("com.google.dagger.hilt.android") version "2.48" apply false
 }
 
-dependencies {
-    classpath("io.objectbox:objectbox-gradle-plugin:4.1.0") // Check version compatibility
-}
+
 
 // Centralized dependency versions
 ext {
@@ -53,7 +52,7 @@ ext {
     set("junit5_version", "5.9.3")
     set("androidx_test_version", "1.5.0")
     set("espresso_version", "3.5.1")
-    set("mockito_version", "5.5.1")
+    set("mockito_version", "5.2.0")
     set("kotest_version", "5.7.2")
     
     // Logging & Analytics

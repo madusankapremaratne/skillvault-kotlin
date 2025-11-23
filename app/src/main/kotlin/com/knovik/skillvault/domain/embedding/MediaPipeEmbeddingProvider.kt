@@ -6,6 +6,7 @@ import com.google.mediapipe.tasks.text.textembedder.TextEmbedder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,7 +18,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class MediaPipeEmbeddingProvider @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private var textEmbedder: TextEmbedder? = null
     private val lock = Any()
@@ -69,10 +70,11 @@ class MediaPipeEmbeddingProvider @Inject constructor(
                 textEmbedder ?: throw IllegalStateException("TextEmbedder not initialized. Call initialize() first.")
             }
 
-            val embeddingResult: EmbeddingResult = embedder.embed(text)
+            val textEmbedderResult = embedder.embed(text)
+            val embeddingResult = textEmbedderResult.embeddingResult()
             
             // Extract the embedding vector from the result
-            val embedding = embeddingResult.embeddingResults().firstOrNull()?.embeddings()?.firstOrNull()?.floatArray()
+            val embedding = embeddingResult.embeddings().firstOrNull()?.floatEmbedding()
                 ?: throw IllegalStateException("No embedding generated")
 
             Timber.d("Embedded text of length ${text.length} -> ${embedding.size}D vector")

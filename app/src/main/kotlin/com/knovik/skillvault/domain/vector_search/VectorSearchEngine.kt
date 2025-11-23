@@ -135,7 +135,7 @@ class VectorSearchEngine @Inject constructor() {
         }
 
         val similarity = dotProduct / (sqrt(normA) * sqrt(normB))
-        return similarity.coerceIn(-1f, 1f).toFloat()
+        return similarity.coerceIn(-1.0, 1.0).toFloat()
     }
 
     /**

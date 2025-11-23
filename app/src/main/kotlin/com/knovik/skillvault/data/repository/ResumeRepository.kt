@@ -3,11 +3,14 @@ package com.knovik.skillvault.data.repository
 import com.knovik.skillvault.data.entity.Resume
 import com.knovik.skillvault.data.entity.ResumeEmbedding
 import com.knovik.skillvault.data.entity.SearchQuery
+import com.knovik.skillvault.data.entity.PerformanceMetric
 import com.knovik.skillvault.data.entity.Resume_
 import com.knovik.skillvault.data.entity.ResumeEmbedding_
+import com.knovik.skillvault.data.entity.SearchQuery_
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import io.objectbox.query.Query
+import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -23,6 +26,7 @@ class ResumeRepository @Inject constructor(
     private val resumeBox: Box<Resume>,
     private val embeddingBox: Box<ResumeEmbedding>,
     private val searchQueryBox: Box<SearchQuery>,
+    private val performanceMetricBox: Box<PerformanceMetric>,
 ) {
 
     /**
@@ -47,7 +51,7 @@ class ResumeRepository @Inject constructor(
      */
     suspend fun getResumeByExternalId(resumeId: String): Resume? = withContext(Dispatchers.IO) {
         resumeBox.query()
-            .equal(Resume_.resumeId, resumeId)
+            .equal(Resume_.resumeId, resumeId, QueryBuilder.StringOrder.CASE_SENSITIVE)
             .build()
             .findFirst()
     }
@@ -60,14 +64,11 @@ class ResumeRepository @Inject constructor(
         limit: Int = 50,
         sortByNewest: Boolean = true
     ): List<Resume> = withContext(Dispatchers.IO) {
-        var query = resumeBox.query()
+        var queryBuilder = resumeBox.query()
         if (sortByNewest) {
-            query = query.orderDesc(Resume_.createdAt)
+            queryBuilder = queryBuilder.order(Resume_.createdAt, QueryBuilder.DESCENDING)
         }
-        query.offset(offset)
-            .limit(limit)
-            .build()
-            .find()
+        queryBuilder.build().find(offset.toLong(), limit.toLong())
     }
 
     /**
@@ -82,7 +83,7 @@ class ResumeRepository @Inject constructor(
      */
     suspend fun getResumesByStatus(status: String): List<Resume> = withContext(Dispatchers.IO) {
         resumeBox.query()
-            .equal(Resume_.processingStatus, status)
+            .equal(Resume_.processingStatus, status, QueryBuilder.StringOrder.CASE_SENSITIVE)
             .build()
             .find()
     }
@@ -93,10 +94,9 @@ class ResumeRepository @Inject constructor(
     suspend fun getUnembeddedResumes(limit: Int = 100): List<Resume> = withContext(Dispatchers.IO) {
         resumeBox.query()
             .equal(Resume_.isEmbedded, false)
-            .orderAsc(Resume_.createdAt)
-            .limit(limit)
+            .order(Resume_.createdAt)
             .build()
-            .find()
+            .find(0, limit.toLong())
     }
 
     /**
@@ -141,7 +141,7 @@ class ResumeRepository @Inject constructor(
      * Batch insert embeddings for better performance.
      */
     suspend fun insertEmbeddingsBatch(embeddings: List<ResumeEmbedding>) = withContext(Dispatchers.IO) {
-        embeddingBox.putAll(embeddings)
+        embeddingBox.put(embeddings)
         Timber.d("Batch inserted ${embeddings.size} embeddings")
     }
 
@@ -160,7 +160,7 @@ class ResumeRepository @Inject constructor(
      */
     suspend fun getEmbeddingsBySegmentType(segmentType: String): List<ResumeEmbedding> = withContext(Dispatchers.IO) {
         embeddingBox.query()
-            .equal(ResumeEmbedding_.segmentType, segmentType)
+            .equal(ResumeEmbedding_.segmentType, segmentType, QueryBuilder.StringOrder.CASE_SENSITIVE)
             .build()
             .find()
     }
@@ -170,10 +170,9 @@ class ResumeRepository @Inject constructor(
      */
     suspend fun getAllEmbeddings(limit: Int = 10000): List<ResumeEmbedding> = withContext(Dispatchers.IO) {
         embeddingBox.query()
-            .orderDesc(ResumeEmbedding_.createdAt)
-            .limit(limit)
+            .order(ResumeEmbedding_.createdAt, QueryBuilder.DESCENDING)
             .build()
-            .find()
+            .find(0, limit.toLong())
     }
 
     /**
@@ -259,9 +258,15 @@ class ResumeRepository @Inject constructor(
      */
     suspend fun getSearchHistory(limit: Int = 50): List<SearchQuery> = withContext(Dispatchers.IO) {
         searchQueryBox.query()
-            .orderDesc(SearchQuery_.executedAt)
-            .limit(limit)
+            .order(SearchQuery_.executedAt, QueryBuilder.DESCENDING)
             .build()
-            .find()
+            .find(0, limit.toLong())
+    }
+
+    /**
+     * Record a performance metric.
+     */
+    suspend fun recordMetric(metric: PerformanceMetric) = withContext(Dispatchers.IO) {
+        performanceMetricBox.put(metric)
     }
 }
