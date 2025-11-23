@@ -21,7 +21,7 @@ class VectorSearchEngineTest : FreeSpec({
     "Vector Operations" - {
         "cosine similarity should return 1 for identical vectors" {
             runTest {
-                val vector = FloatArray(384) { 0.5f }
+                val vector = FloatArray(512) { 0.5f }
                 val embedding = ResumeEmbedding(
                     id = 1,
                     resumeId = 1,
@@ -51,12 +51,12 @@ class VectorSearchEngineTest : FreeSpec({
 
         "similarity score should be between -1 and 1" {
             runTest {
-                val query = FloatArray(384) { kotlin.random.Random.nextFloat() }
+                val query = FloatArray(512) { kotlin.random.Random.nextFloat() }
                 val candidates = (1..10).map { i ->
                     ResumeEmbedding(
                         id = i.toLong(),
                         resumeId = i.toLong(),
-                        embedding = FloatArray(384) { kotlin.random.Random.nextFloat() }
+                        embedding = FloatArray(512) { kotlin.random.Random.nextFloat() }
                     )
                 }
 
@@ -173,12 +173,12 @@ class VectorSearchEngineTest : FreeSpec({
     "Performance Metrics" - {
         "search should execute within reasonable time" {
             runTest {
-                val query = FloatArray(384) { kotlin.random.Random.nextFloat() }
+                val query = FloatArray(512) { kotlin.random.Random.nextFloat() }
                 val candidates = (1..1000).map { i ->
                     ResumeEmbedding(
                         id = i.toLong(),
                         resumeId = i.toLong(),
-                        embedding = FloatArray(384) { kotlin.random.Random.nextFloat() }
+                        embedding = FloatArray(512) { kotlin.random.Random.nextFloat() }
                     )
                 }
 
