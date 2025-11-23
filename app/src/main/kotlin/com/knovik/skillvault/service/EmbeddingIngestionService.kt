@@ -1,9 +1,11 @@
 package com.knovik.skillvault.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.BackoffPolicy
@@ -13,6 +15,8 @@ import com.knovik.skillvault.data.entity.Resume
 import com.knovik.skillvault.data.entity.ResumeEmbedding
 import com.knovik.skillvault.data.repository.ResumeRepository
 import com.knovik.skillvault.domain.embedding.MediaPipeEmbeddingProvider
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -185,13 +189,13 @@ class EmbeddingIngestionService : Service() {
  * WorkManager worker for background embedding ingestion.
  * Allows scheduling of embedding tasks without keeping service alive.
  */
-class EmbeddingIngestionWorker(
-    context: android.content.Context,
-    params: WorkerParameters,
+@HiltWorker
+class EmbeddingIngestionWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val resumeRepository: ResumeRepository,
+    private val embeddingProvider: MediaPipeEmbeddingProvider,
 ) : CoroutineWorker(context, params) {
-
-    @Inject lateinit var resumeRepository: ResumeRepository
-    @Inject lateinit var embeddingProvider: MediaPipeEmbeddingProvider
 
     override suspend fun doWork(): ListenableWorker.Result {
         return try {

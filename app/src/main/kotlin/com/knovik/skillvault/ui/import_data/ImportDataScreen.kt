@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -109,6 +110,12 @@ fun ImportDataScreen(
 
             // Status display
             StatusDisplay(uiState = uiState, onDismiss = { viewModel.resetState() })
+
+            // Manual embedding generation
+            EmbeddingCard(
+                onGenerateEmbeddings = { viewModel.generateEmbeddings() },
+                uiState = uiState
+            )
 
             // Help text
             HelpCard()
@@ -291,6 +298,45 @@ fun StatusDisplay(
         }
         ImportUiState.Idle -> {
             // No status to display
+        }
+    }
+}
+
+@Composable
+fun EmbeddingCard(
+    onGenerateEmbeddings: () -> Unit,
+    uiState: ImportUiState
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Generate Embeddings",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Generate or regenerate vector embeddings for all imported resumes. " +
+                      "This enables semantic search functionality.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Button(
+                onClick = onGenerateEmbeddings,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState !is ImportUiState.Loading
+            ) {
+                Icon(Icons.Default.Refresh, "Generate", modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Generate Embeddings")
+            }
         }
     }
 }

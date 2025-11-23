@@ -1,16 +1,20 @@
 package com.knovik.skillvault
 
 import android.app.Application
-import com.knovik.skillvault.data.entity.ResumeEmbedding_
-import com.knovik.skillvault.data.entity.SearchQuery_
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Application entry point with Hilt dependency injection support.
  */
 @HiltAndroidApp
-class SkillVaultApplication : Application() {
+class SkillVaultApplication : Application(), Configuration.Provider {
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -49,4 +53,13 @@ class SkillVaultApplication : Application() {
             }
         }
     }
+
+    /**
+     * Provide WorkManager configuration with HiltWorkerFactory.
+     * This enables dependency injection in WorkManager workers.
+     */
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }
