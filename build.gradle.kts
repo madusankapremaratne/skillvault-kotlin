@@ -4,7 +4,11 @@ plugins {
     id("com.android.library") version "8.2.0" apply false
     kotlin("android") version "1.9.20" apply false
     kotlin("kapt") version "1.9.20" apply false
-    id("io.objectbox") version "3.7.0" apply false
+    id("io.objectbox") version "4.1.0" apply false
+}
+
+dependencies {
+    classpath("io.objectbox:objectbox-gradle-plugin:4.1.0") // Check version compatibility
 }
 
 // Centralized dependency versions
@@ -26,7 +30,7 @@ ext {
     set("constraintlayout_version", "2.1.4")
     
     // Database & Storage
-    set("objectbox_version", "3.7.0")
+    set("objectbox_version", "5.0.1")
     set("room_version", "2.6.0")
     
     // Networking & Data
