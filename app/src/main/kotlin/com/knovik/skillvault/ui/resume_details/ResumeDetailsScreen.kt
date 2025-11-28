@@ -10,10 +10,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +35,17 @@ fun ResumeDetailsScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showAnalysisDialog by remember { mutableStateOf(false) }
+
+    if (showAnalysisDialog) {
+        val currentResume = (uiState as? ResumeDetailsUiState.Success)?.resume
+        if (currentResume != null) {
+            com.knovik.skillvault.ui.llm_chat.CandidateAnalysisDialog(
+                resumeId = currentResume.id,
+                onDismiss = { showAnalysisDialog = false }
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -74,7 +89,8 @@ fun ResumeDetailsScreen(
                     ResumeContent(
                         resume = state.resume,
                         exactMatchQuery = state.exactMatchQuery,
-                        semanticMatchText = state.semanticMatchText
+                        semanticMatchText = state.semanticMatchText,
+                        onAnalyzeClick = { showAnalysisDialog = true }
                     )
                 }
             }
@@ -86,7 +102,8 @@ fun ResumeDetailsScreen(
 fun ResumeContent(
     resume: Resume,
     exactMatchQuery: String? = null,
-    semanticMatchText: String? = null
+    semanticMatchText: String? = null,
+    onAnalyzeClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -172,6 +189,20 @@ fun ResumeContent(
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
                     }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Button(
+                    onClick = onAnalyzeClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Analyze Fit with AI")
                 }
             }
         }

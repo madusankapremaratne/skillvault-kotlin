@@ -26,6 +26,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SkillVault"
         android:usesCleartextTraffic="false"
+        android:largeHeap="true"
         tools:targetApi="33">
 
         <!-- Main Activity -->

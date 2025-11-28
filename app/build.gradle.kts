@@ -115,6 +115,7 @@ dependencies {
     
     // MediaPipe - On-Device ML (Text Embeddings)
     implementation("com.google.mediapipe:tasks-text:${rootProject.ext.get("mediapipe_version")}")
+    implementation("com.google.mediapipe:tasks-genai:0.10.14")
     
     // Logging
     implementation("com.jakewharton.timber:timber:${rootProject.ext.get("timber_version")}")
