@@ -42,6 +42,7 @@ class ResumeCSVImporter(
             val resumes = mutableListOf<Resume>()
             val reader = BufferedReader(InputStreamReader(java.io.FileInputStream(filePath)))
             
+            val startTime = System.currentTimeMillis()
             reader.use { input ->
                 var line: String?
                 var lineNumber = 0
@@ -84,6 +85,9 @@ class ResumeCSVImporter(
                     }
                 }
             }
+            val endTime = System.currentTimeMillis()
+            val duration = endTime - startTime
+            android.util.Log.d("EdgeScoutExperiment", "CSV_IMPORT_TIME, ${resumes.size}, $duration")
 
             Timber.d("Imported ${resumes.size} resumes from CSV")
             Result.success(resumes)
@@ -316,6 +320,8 @@ class ResumeCSVImporter(
             val resumes = mutableListOf<Resume>()
             val csvReader = CSVReader(FileReader(file))
             
+            val startTime = System.currentTimeMillis()
+            
             val headers = csvReader.readNext()?.map { it.trim() } ?: emptyList()
             var lineNumber = 0
             var line: Array<String>?
@@ -349,6 +355,10 @@ class ResumeCSVImporter(
             }
 
             csvReader.close()
+            
+            val endTime = System.currentTimeMillis()
+            val duration = endTime - startTime
+            android.util.Log.d("EdgeScoutExperiment", "CSV_IMPORT_DETECTION_TIME, ${resumes.size}, $duration")
 
             Timber.d("Imported ${resumes.size} resumes from $sourceFile")
             Result.success(resumes)

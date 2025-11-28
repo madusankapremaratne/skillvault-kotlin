@@ -74,10 +74,13 @@ class MediaPipeEmbeddingProvider @Inject constructor(
             val embeddingResult = textEmbedderResult.embeddingResult()
             
             // Extract the embedding vector from the result
-            val embedding = embeddingResult.embeddings().firstOrNull()?.floatEmbedding()
+            val rawEmbedding = embeddingResult.embeddings().firstOrNull()?.floatEmbedding()
                 ?: throw IllegalStateException("No embedding generated")
 
-            Timber.d("Embedded text of length ${text.length} -> ${embedding.size}D vector")
+            // Normalize the embedding for cosine similarity
+            val embedding = normalizeEmbedding(rawEmbedding)
+
+            Timber.d("Embedded text of length ${text.length} -> ${embedding.size}D vector (normalized)")
             
             Result.success(embedding)
         } catch (e: Exception) {

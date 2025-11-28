@@ -142,6 +142,7 @@ class EmbeddingIngestionService : Service() {
      * Generate embeddings for all sections of a resume.
      */
     private suspend fun generateEmbeddings(resume: Resume): List<ResumeEmbedding> {
+        val startTime = System.currentTimeMillis()
         val embeddings = mutableListOf<ResumeEmbedding>()
         var segmentId = 0
 
@@ -161,7 +162,9 @@ class EmbeddingIngestionService : Service() {
             val segments = embeddingProvider.segmentText(sectionText, sectionType)
 
             for (segment in segments) {
-                val embeddingResult = embeddingProvider.embedText(segment.first)
+                // Prepend section type to text for better semantic context
+                val textToEmbed = "${sectionType}: ${segment.first}"
+                val embeddingResult = embeddingProvider.embedText(textToEmbed)
                 
                 if (embeddingResult.isSuccess) {
                     embeddings.add(
@@ -169,7 +172,7 @@ class EmbeddingIngestionService : Service() {
                             resumeId = resume.id,
                             segmentId = "${sectionType}_${segmentId}",
                             segmentType = sectionType,
-                            segmentText = segment.first,
+                            segmentText = segment.first, // Store original text
                             embedding = embeddingResult.getOrThrow(),
                         )
                     )
@@ -179,6 +182,10 @@ class EmbeddingIngestionService : Service() {
                 }
             }
         }
+
+        val endTime = System.currentTimeMillis()
+        val duration = endTime - startTime
+        android.util.Log.d("EdgeScoutExperiment", "EMBEDDING_GENERATION_TIME, ${resume.id}, $duration")
 
         Timber.d("Generated ${embeddings.size} embeddings for resume ${resume.id}")
         return embeddings
@@ -248,6 +255,7 @@ class EmbeddingIngestionWorker @AssistedInject constructor(
     }
 
     private suspend fun generateEmbeddings(resume: Resume): List<ResumeEmbedding> {
+        val startTime = System.currentTimeMillis()
         val embeddings = mutableListOf<ResumeEmbedding>()
         var segmentId = 0
 
@@ -264,7 +272,9 @@ class EmbeddingIngestionWorker @AssistedInject constructor(
 
             val segments = embeddingProvider.segmentText(sectionText, sectionType)
             for (segment in segments) {
-                val embeddingResult = embeddingProvider.embedText(segment.first)
+                // Prepend section type to text for better semantic context
+                val textToEmbed = "${sectionType}: ${segment.first}"
+                val embeddingResult = embeddingProvider.embedText(textToEmbed)
                 
                 if (embeddingResult.isSuccess) {
                     embeddings.add(
@@ -272,7 +282,7 @@ class EmbeddingIngestionWorker @AssistedInject constructor(
                             resumeId = resume.id,
                             segmentId = "${sectionType}_${segmentId}",
                             segmentType = sectionType,
-                            segmentText = segment.first,
+                            segmentText = segment.first, // Store original text
                             embedding = embeddingResult.getOrThrow(),
                         )
                     )
@@ -280,6 +290,10 @@ class EmbeddingIngestionWorker @AssistedInject constructor(
                 }
             }
         }
+
+        val endTime = System.currentTimeMillis()
+        val duration = endTime - startTime
+        android.util.Log.d("EdgeScoutExperiment", "EMBEDDING_GENERATION_TIME_WORKER, ${resume.id}, $duration")
 
         return embeddings
     }

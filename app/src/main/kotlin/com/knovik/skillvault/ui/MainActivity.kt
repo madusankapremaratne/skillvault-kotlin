@@ -46,6 +46,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     data object ResumeList : Screen("resume_list", "Resumes", Icons.Filled.Home)
     data object Search : Screen("search", "Search", Icons.Filled.Search)
     data object ImportData : Screen("import_data", "Import", Icons.Filled.Home)
+    data object ResumeDetails : Screen("resume_details/{resumeId}?query={query}&segmentId={segmentId}", "Details", Icons.Filled.Home)
 }
 
 /**
@@ -64,20 +65,22 @@ fun MainScreen() {
                 val currentDestination = navBackStackEntry?.destination
                 
                 items.forEach { screen ->
+                    // For the bottom bar, we only care about the base route for ResumeDetails if it were there, 
+                    // but it's not a main tab.
+                    val selected = currentDestination?.hierarchy?.any { 
+                        it.route?.startsWith(screen.route.substringBefore("/")) == true 
+                    } == true
+                    
                     NavigationBarItem(
                         icon = { Icon(screen.icon, contentDescription = screen.title) },
                         label = { Text(screen.title) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        selected = selected,
                         onClick = {
                             navController.navigate(screen.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
-                                // Avoid multiple copies of the same destination
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         }
@@ -99,12 +102,37 @@ fun MainScreen() {
                 )
             }
             composable(Screen.Search.route) {
-                SearchScreen()
+                SearchScreen(
+                    onNavigateToDetails = { resumeId, query, segmentId ->
+                        val route = "resume_details/$resumeId?query=$query&segmentId=$segmentId"
+                        navController.navigate(route)
+                    }
+                )
             }
             composable(Screen.ImportData.route) {
                 ImportDataScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onImportSuccess = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.ResumeDetails.route,
+                arguments = listOf(
+                    androidx.navigation.navArgument("resumeId") { type = androidx.navigation.NavType.LongType },
+                    androidx.navigation.navArgument("query") { 
+                        type = androidx.navigation.NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                    androidx.navigation.navArgument("segmentId") { 
+                        type = androidx.navigation.NavType.StringType 
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
+                com.knovik.skillvault.ui.resume_details.ResumeDetailsScreen(
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }

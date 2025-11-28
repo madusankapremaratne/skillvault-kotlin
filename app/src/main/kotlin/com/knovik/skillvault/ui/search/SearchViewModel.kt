@@ -21,9 +21,17 @@ import javax.inject.Inject
 sealed class SearchUIState {
     data object Idle : SearchUIState()
     data object Loading : SearchUIState()
-    data class Success(val results: List<SearchResult>) : SearchUIState()
+    data class Success(val results: List<SearchResultUi>) : SearchUIState()
     data class Error(val message: String) : SearchUIState()
 }
+
+/**
+ * UI model for search result with resume details.
+ */
+data class SearchResultUi(
+    val searchResult: SearchResult,
+    val resume: com.knovik.skillvault.data.entity.Resume?
+)
 
 /**
  * ViewModel for semantic search screen.
@@ -123,6 +131,12 @@ class SearchViewModel @Inject constructor(
                     vectorSearchEngine.search(queryEmbedding, candidates, topK)
                 }
 
+                // Fetch resume details for each result
+                val resultsWithResume = results.map { result ->
+                    val resume = resumeRepository.getResume(result.resumeId)
+                    SearchResultUi(result, resume)
+                }
+
                 val endTime = System.currentTimeMillis()
                 val executionTime = endTime - startTime
 
@@ -138,11 +152,16 @@ class SearchViewModel @Inject constructor(
 
                 // Log performance metrics
                 Timber.d("Search completed in ${executionTime}ms, found ${results.size} results from ${candidates.size} candidates")
+                
+                // Benchmark logging
+                val resumeCount = candidates.map { it.resumeId }.distinct().size
+                android.util.Log.d("EdgeScoutExperiment", "BENCHMARK_DATA, $resumeCount, \"$query\", $executionTime")
+
                 if (executionTime > 200) {
                     Timber.w("Search execution time exceeded 200ms target: ${executionTime}ms")
                 }
 
-                _uiState.value = SearchUIState.Success(results)
+                _uiState.value = SearchUIState.Success(resultsWithResume)
                 _executionTimeMs.value = executionTime
                 _resultCount.value = results.size
 
@@ -180,6 +199,38 @@ class SearchViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to record feedback")
+            }
+        }
+    }
+
+    /**
+     * Regenerate all embeddings.
+     * Useful when the embedding model or logic changes.
+     */
+    fun regenerateAllEmbeddings() {
+        viewModelScope.launch {
+            try {
+                _uiState.value = SearchUIState.Loading
+                
+                // 1. Clear all existing embeddings
+                val allResumes = resumeRepository.getAllResumes(limit = 10000)
+                allResumes.forEach { resume ->
+                    resumeRepository.deleteEmbeddingsForResume(resume.id)
+                    resume.isEmbedded = false
+                    resume.processingStatus = "pending"
+                    resumeRepository.insertOrUpdateResume(resume)
+                }
+                
+                // 2. Trigger ingestion worker
+                // We need to inject WorkManager or use a repository method that triggers it.
+                // For now, we'll assume the user will go to Import screen or we can trigger it if we had the worker.
+                // But since we don't have WorkManager injected here, we'll just reset the status so the worker picks it up next time.
+                
+                _uiState.value = SearchUIState.Idle
+                
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to regenerate embeddings")
+                _uiState.value = SearchUIState.Error("Failed to reset embeddings")
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,7 +19,8 @@ import com.knovik.skillvault.domain.vector_search.SearchResult
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
+    onNavigateToDetails: (Long, String, String) -> Unit = { _, _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -31,6 +33,11 @@ fun SearchScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Semantic Search") },
+                actions = {
+                    IconButton(onClick = { viewModel.regenerateAllEmbeddings() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Regenerate Index")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -159,7 +166,16 @@ fun SearchScreen(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(state.results) { result ->
-                                    SearchResultCard(result)
+                                    SearchResultCard(
+                                        resultUi = result,
+                                        onClick = { 
+                                            onNavigateToDetails(
+                                                result.searchResult.resumeId,
+                                                searchQuery,
+                                                result.searchResult.embedding.segmentId
+                                            ) 
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -191,36 +207,61 @@ fun SearchScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultCard(result: SearchResult) {
+fun SearchResultCard(
+    resultUi: SearchResultUi,
+    onClick: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Resume Name and Match Score
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = result.segmentType.uppercase(),
+                    text = resultUi.resume?.fullName ?: "Unknown Candidate",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "${(resultUi.searchResult.similarityScore * 100).toInt()}% match",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            // Matched Area Label
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.small
+            ) {
                 Text(
-                    text = "${(result.similarityScore * 100).toInt()}% match",
+                    text = "Matched in: ${resultUi.searchResult.segmentType.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
+            
             Spacer(modifier = Modifier.height(8.dp))
+            
+            // Matched Content
             Text(
-                text = result.segmentText,
+                text = resultUi.searchResult.segmentText,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 4,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
