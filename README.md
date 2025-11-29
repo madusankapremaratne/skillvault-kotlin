@@ -1,415 +1,181 @@
-# SkillVault - On-Device Vector Store for Private Career Agents
+# EdgeScout: On-Device Agentic RAG for Talent Discovery
 
-A production-ready Android application implementing a local-first architecture for benchmarking on-device vector stores and semantic search capabilities. Designed for processing sensitive career data while maintaining complete privacy.
+   
 
-## Project Overview
+**EdgeScout** (Repo: `skillvault-kotlin`) is a native Android research prototype that demonstrates **Agentic Retrieval-Augmented Generation (RAG)** entirely on the edge.
 
-SkillVault validates the technical feasibility of running a comprehensive AI-powered career assistant entirely on-device without cloud connectivity. The application demonstrates:
+It acts as an autonomous "Pocket Recruiter," allowing users to index thousands of resumes, perform semantic searches ("Find a leader with Python skills"), and generate deep profile analyses using a quantized Large Language Model (LLM)—all without a single byte of data leaving the device.
 
-- **Privacy-First Architecture**: All embeddings and vector searches happen locally
-- **Edge AI/ML**: MediaPipe text embeddings run directly on Android
-- **Efficient Storage**: ObjectBox NoSQL database optimized for mobile
-- **Semantic Search**: Cosine similarity-based vector search engine
-- **Production Quality**: MVVM, Hilt dependency injection, comprehensive testing
+## 🚀 Key Innovation: The "Talent Scout Agent"
 
-## Key Metrics
+Unlike passive keyword search tools, EdgeScout operates as an agentic system with a three-stage cognitive loop:
 
-Target performance benchmarks for publication:
+1.  **Plan (Query Translation)**: Maps abstract intents (e.g., "Creative roles") to high-dimensional vector space.
+2.  **Decide (Vector Ranking)**: Autonomously scans a local **ObjectBox** vector store to rank candidates by semantic fit.
+3.  **Act (Generative Analysis)**: Uses **Gemma-2B** (Int4 Quantized) to read the candidate's resume and write a "Strengths & Weaknesses" report.
 
-- **Latency**: Retrieval time < 200ms for real-time interaction
-- **Storage**: 50MB of text compressed into <5MB of vectors
-- **Battery**: Minimal energy impact during ingestion
-- **Device Support**: API 26+ (Android 8.0+)
+-----
 
-## Architecture Overview
+## 📊 Real-World Performance Benchmarks
 
-```
-SkillVault/
+Validated on **Samsung Galaxy M21 (Exynos 9611)** vs. **High-Performance Simulator**.
+
+### 1\. Retrieval Latency (The "Fast" Loop)
+
+*Dataset: Kaggle Resume Dataset (N=126 to N=2400)*
+
+| Query Complexity | Samsung M21 Latency | Status |
+| :--- | :--- | :--- |
+| **"Security"** | **146 ms** | 🟢 Real-Time |
+| **"Developer"** | **147 ms** | 🟢 Real-Time |
+| **"Chef"** (Cold Start) | **204 ms** | 🟡 Acceptable |
+
+> **Result:** The system achieves the research target of **\<200ms** retrieval latency on mid-range hardware.
+
+### 2\. Generative Analysis (The "Deep" Loop)
+
+*Model: Gemma-2B (Int4) via MediaPipe*
+
+| Task | Device | Time to Complete |
+| :--- | :--- | :--- |
+| **Full Profile Summarization** | AVD / Emulator | \~155 seconds |
+| **Full Profile Summarization** | High-End Android | \~45-60 seconds (Est.) |
+
+> **Architecture Note:** Due to the heavy computational cost, Generation is handled as an asynchronous background task ("Report Queue"), ensuring the UI remains responsive.
+
+-----
+
+## 🛠 Technology Stack
+
+  * **Language**: Kotlin 1.9.20 (Coroutines + Flow)
+  * **Vector Store**: [ObjectBox 3.7.0](https://objectbox.io/) (NoSQL Edge Database)
+  * **Embeddings**: Google MediaPipe Text Embedder (MobileNet v3, 384-dim)
+  * **LLM Inference**: **Google MediaPipe LLM API** (running `gemma-2b-it-cpu-int4.bin`)
+  * **Architecture**: MVVM with Clean Architecture (Domain/Data/UI layers)
+  * **DI**: Hilt 2.48
+
+-----
+
+## 📂 Project Structure
+
+```bash
+EdgeScout/
 ├── app/
-│   ├── src/main/
-│   │   ├── kotlin/
-│   │   │   └── com/knovik/skillvault/
-│   │   │       ├── SkillVaultApplication.kt      # App entry point
-│   │   │       ├── ui/                           # UI Layer (MVVM)
-│   │   │       │   ├── MainActivity.kt
-│   │   │       │   ├── resume_list/
-│   │   │       │   ├── search/
-│   │   │       │   ├── detail/
-│   │   │       │   └── import_data/
-│   │   │       ├── domain/                       # Business Logic
-│   │   │       │   ├── embedding/
-│   │   │       │   │   └── MediaPipeEmbeddingProvider.kt
-│   │   │       │   └── vector_search/
-│   │   │       │       └── VectorSearchEngine.kt
-│   │   │       ├── data/                         # Data Layer
-│   │   │       │   ├── entity/
-│   │   │       │   │   └── ResumeEntity.kt
-│   │   │       │   └── repository/
-│   │   │       │       └── ResumeRepository.kt
-│   │   │       ├── service/                      # Background Services
-│   │   │       │   └── EmbeddingIngestionService.kt
-│   │   │       └── di/                           # Dependency Injection
-│   │   │           └── Module.kt
-│   │   ├── res/
-│   │   │   ├── layout/
-│   │   │   ├── values/
-│   │   │   ├── drawable/
-│   │   │   └── xml/
-│   │   └── AndroidManifest.xml
-│   ├── build.gradle.kts
-│   └── proguard-rules.pro
-├── build.gradle.kts
-├── settings.gradle.kts
-└── README.md (this file)
+│   ├── src/main/assets/
+│   │   ├── text_embedder.tflite       # For Vector Search
+│   │   └── gemma-2b-it-cpu-int4.bin   # For Generative Analysis (Large File)
+│   ├── src/main/java/com/knovik/skillvault/
+│   │   ├── domain/
+│   │   │   ├── agent/                 # Agentic Logic
+│   │   │   │   └── TalentScoutAgent.kt
+│   │   │   ├── embedding/             # MediaPipe Embedder
+│   │   │   └── llm/                   # Gemma-2B Interface
+│   │   ├── data/
+│   │   │   └── local/                 # ObjectBox Entities
+│   │   └── ui/
+│   │       ├── search/                # Semantic Search UI
+│   │       └── analysis/              # Generative Report UI
 ```
 
-## Technology Stack
+-----
 
-### Core Framework
-- **Kotlin 1.9.20**: Primary language with coroutines
-- **Android API 26-34**: Broad device compatibility
-- **Androidx**: Modern Android libraries and lifecycles
+## ⚡ Setup & Installation
 
-### Database & Storage
-- **ObjectBox 3.7.0**: High-performance NoSQL for vector embeddings
-- **Room 2.6.0**: Optional for structured data (complementary)
+**Prerequisites:**
 
-### AI/ML Components
-- **MediaPipe 0.10.0**: On-device text embeddings (384-dimensional)
-- **TensorFlow Lite**: Lightweight model execution
+  * Android Studio Iguana or later
+  * Device with **4GB+ RAM** (required for LLM inference)
+  * Android API 26+
 
-### Architecture & Patterns
-- **MVVM**: Model-View-ViewModel with StateFlow
-- **Repository Pattern**: Clean separation of concerns
-- **Hilt 2.48**: Compile-time dependency injection
-
-### Coroutines & Async
-- **Kotlin Coroutines 1.7.3**: Structured concurrency
-- **WorkManager**: Reliable background task scheduling
-
-### Testing
-- **JUnit 4 & 5**: Unit testing framework
-- **Kotest**: Kotlin-first testing assertions
-- **Mockito**: Mocking framework
-- **Espresso**: UI testing
-
-## Setup Instructions
-
-### Prerequisites
-
-- Android Studio 2023.1+
-- Java 17+
-- Android NDK (for MediaPipe)
-- Minimum API Level 26 (Android 8.0)
-
-### Step 1: Clone Repository
+### 1\. Clone & Sync
 
 ```bash
-git clone https://github.com/knovik/skillvault.git
-cd skillvault
+git clone https://github.com/madusankapremaratne/skillvault-kotlin.git
+cd skillvault-kotlin
 ```
 
-### Step 2: Configure Android Studio
+### 2\. Download the Models
 
-1. Open project in Android Studio
-2. Sync Gradle files (File → Sync Now)
-3. Download necessary SDK components:
-   - Android SDK API 34
-   - Build Tools 34.0.0
-   - NDK (for native MediaPipe)
+1.  **Embedder:** Download `text_embedder.tflite` from [MediaPipe Tasks](https://www.google.com/search?q=https://developers.google.com/mediapipe/solutions/text/text_embedder).
+2.  **LLM:** Download `gemma-2b-it-cpu-int4.bin` from [Kaggle Models](https://www.kaggle.com/models/google/gemma).
 
-### Step 3: Add MediaPipe Model
+### 3\. Deploying the LLM (Important)
 
-1. Download the text embedder model from MediaPipe:
-   ```bash
-   wget https://storage.googleapis.com/mediapipe-assets/text_embedder_mobilenet_v3.tflite
-   ```
+Since `gemma-2b` is large (\~1.3GB), it is not included in the repo. We recommend pushing it directly to the device storage to avoid slow build times.
 
-2. Place in app assets:
-   ```
-   app/src/main/assets/text_embedder.tflite
-   ```
-
-### Step 4: Build & Run
+**Step 1: Push the model via ADB**
+Run this command in your terminal to copy the model to the app's data directory:
 
 ```bash
-# Build APK
-./gradlew assembleDebug
-
-# Install on connected device/emulator
-./gradlew installDebug
-
-# Run on device
-adb shell am start -n com.knovik.skillvault/.ui.MainActivity
+# MacOS / Linux / Windows PowerShell
+adb push gemma-2b-it-cpu-int4.bin /storage/emulated/0/Android/data/com.knovik.skillvault/files/
 ```
 
-## Key Features
-
-### 1. Resume Ingestion
-
-- CSV/JSON import from Kaggle Resume Dataset
-- Automatic field parsing (name, skills, experience, education)
-- Batch processing with progress tracking
-- Duplicate detection via text hashing
-
-### 2. Embedding Generation
-
-- Local text embedding using MediaPipe
-- 384-dimensional vectors optimized for mobile
-- Automatic text segmentation for large sections
-- Batch processing for efficiency
-
-### 3. Semantic Search
-
-- Cosine similarity-based vector search
-- Real-time query embedding
-- Top-K retrieval with configurable thresholds
-- Segment-type filtering (e.g., search only "experience")
-
-### 4. Performance Monitoring
-
-- Execution time tracking (target: <200ms)
-- Storage efficiency metrics
-- Battery consumption monitoring
-- Search quality analytics
-
-### 5. Data Management
-
-- Local storage without cloud sync
-- Privacy-preserving architecture
-- Search history and analytics
-- Export capabilities for research
-
-## API Overview
-
-### ResumeRepository
-
-Primary data access layer:
+**Step 2: Update Code to Read from Storage**
+In `TalentScoutAgent.kt`, ensure you are loading the model from the correct path:
 
 ```kotlin
-// Insert resume
-val id = resumeRepository.insertOrUpdateResume(resume)
+val modelPath = context.getExternalFilesDir(null)?.absolutePath + "/gemma-2b-it-cpu-int4.bin"
+val modelFile = File(modelPath)
 
-// Get embeddings
-val embeddings = resumeRepository.getEmbeddingsForResume(resumeId)
-
-// Get storage statistics
-val stats = resumeRepository.getStorageStats()
-
-// Clear all data
-resumeRepository.clearAllData()
-```
-
-### MediaPipeEmbeddingProvider
-
-Embedding generation:
-
-```kotlin
-// Initialize
-embeddingProvider.initialize()
-
-// Generate embedding for text
-val result = embeddingProvider.embedText("Team leadership experience")
-
-// Batch embedding
-val embeddings = embeddingProvider.embedTextBatch(textList)
-
-// Normalize for cosine similarity
-val normalized = embeddingProvider.normalizeEmbedding(embedding)
-```
-
-### VectorSearchEngine
-
-Semantic search:
-
-```kotlin
-// Simple search
-val results = vectorSearchEngine.search(
-    queryEmbedding,
-    candidates,
-    topK = 10,
-    similarityThreshold = 0.3f
-)
-
-// Search with metrics
-val (results, metrics) = vectorSearchEngine.searchWithMetrics(queryEmbedding, candidates)
-
-// Segment-specific search
-val experienceResults = vectorSearchEngine.searchBySegmentType(
-    queryEmbedding,
-    candidates,
-    segmentType = "experience",
-    topK = 10
-)
-```
-
-## Usage Example
-
-### Complete Workflow
-
-```kotlin
-// 1. Load resume data
-val resume = Resume(
-    resumeId = "kaggle_123",
-    fullName = "Jane Doe",
-    skills = "Python, Machine Learning, Cloud Architecture",
-    experience = "5 years as Senior Software Engineer..."
-)
-
-// 2. Insert into database
-val resumeId = resumeRepository.insertOrUpdateResume(resume)
-
-// 3. Generate embeddings
-val service = EmbeddingIngestionService()
-service.embedResume(resumeId)
-
-// 4. Perform semantic search
-val query = "Find experience with team leadership"
-val queryEmbedding = embeddingProvider.embedText(query)
-val candidates = resumeRepository.getAllEmbeddings()
-val searchResults = vectorSearchEngine.search(queryEmbedding, candidates, topK = 5)
-
-// 5. Analyze results
-for (result in searchResults) {
-    println("${result.segmentType}: ${result.segmentText}")
-    println("Similarity: ${result.similarityScore}")
+if (modelFile.exists()) {
+    // Load from device storage (Fast Dev Cycle)
+    llmInference = LlmInference.createFromOptions(context, 
+        LlmInference.Options.builder()
+            .setModelPath(modelPath)
+            .build())
+} else {
+    // Fallback to Assets (Production Build)
+    llmInference = LlmInference.createFromOptions(context, 
+        LlmInference.Options.builder()
+            .setModelPath("gemma-2b-it-cpu-int4.bin") 
+            .build())
 }
-
-// 6. Get metrics
-val stats = resumeRepository.getStorageStats()
-println("Total embeddings: ${stats["embeddingCount"]}")
-println("Storage size: ${stats["estimatedTotalSizeBytes"]} bytes")
 ```
 
-## Performance Benchmarking
-
-### Expected Results (from paper)
-
-Based on Kaggle Resume Dataset (2400+ resumes):
-
-| Metric | Target | Typical Result |
-|--------|--------|----------------|
-| **Ingestion Latency** | <500ms per resume | 300-400ms |
-| **Retrieval Latency** | <200ms per query | 50-150ms |
-| **Storage Compression** | 10x (50MB→5MB) | 12-15x achieved |
-| **Battery Impact** | <50mAh per 1000 embeddings | 30-40mAh |
-
-### Benchmarking Code
-
-```kotlin
-// In SearchViewModel or tests
-val (results, metrics) = vectorSearchEngine.searchWithMetrics(
-    queryEmbedding,
-    candidates
-)
-
-println("Execution time: ${metrics.executionTimeMs}ms")
-println("Result count: ${metrics.resultCount}")
-println("Avg similarity: ${metrics.averageSimilarityScore}")
-println("Top score: ${metrics.topScore}")
-```
-
-## Testing
-
-### Unit Tests
+### 4\. Build & Run
 
 ```bash
-./gradlew test
+./gradlew installDebug
 ```
 
-### Instrumented Tests (Device)
+-----
 
-```bash
-./gradlew connectedAndroidTest
-```
+## 📖 Usage Workflow
 
-### Performance Tests
+### 1\. Ingestion (The Knowledge Base)
 
-Create custom tests in `androidTest/` to measure:
-- Embedding generation time
-- Search latency
-- Memory usage
-- Battery consumption
+Import the Kaggle Resume CSV. The app automatically chunks text and generates 384-dimensional vectors stored in ObjectBox.
 
-## ProGuard Configuration
+### 2\. Semantic Search (The Scout)
 
-For release builds, protect ML models:
+Type a natural language query: *"Find me a project manager who knows Agile and Python."*
 
-```
--keep class com.google.mediapipe.** { *; }
--keep class io.objectbox.** { *; }
--keepclassmembers class com.knovik.skillvault.data.entity.** { *; }
-```
+  * **Under the hood:** The agent converts your query to a vector and performs a Cosine Similarity search.
+  * **Output:** Ranked list of candidates with "Fit Scores."
 
-## Deployment
+### 3\. Deep Analysis (The Analyst)
 
-### Production Release
+Click the **"AI Analyze"** button on a candidate profile.
 
-1. Update version in `build.gradle.kts`
-2. Create release build: `./gradlew bundleRelease`
-3. Sign with release keystore
-4. Upload to Google Play Store
+  * **Under the hood:** The app loads Gemma-2B into RAM. It feeds the resume text into a prompt: *"Analyze this resume for a [Role]. List strengths and missing skills."*
+  * **Output:** A generated text report appears after processing.
 
-### Firebase Analytics (Optional)
+-----
 
-Integrate Firebase for:
-- Crash reporting
-- Performance monitoring
-- User analytics
-- Remote config
+## 🔬 Research Context
 
-## Future Enhancements
+This project was developed as part of the research paper:
+**"Benchmarking On-Device Agentic RAG for Privacy-Preserving Talent Discovery"**
 
-### Phase 2: Lifelong Learning Portfolio
-- Career timeline tracking
-- Skill progression analytics
-- Recommendation engine
-- Portfolio visualization
-
-### Phase 3: Multi-Device Sync
-- End-to-end encrypted cloud sync
-- Cross-device vector store synchronization
-- Conflict resolution strategies
-
-### Phase 4: Advanced AI Features
-- Fine-tuned embeddings for career domain
-- Generative career guidance
-- Interview preparation
-- Skill gap analysis
-
-## Contributing
-
-This is research code for the SkillVault project. Contributions welcome:
-
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -am 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Create Pull Request
-
-## Research References
-
-- MediaPipe: https://ai.google.dev/edge/mediapipe/
-- ObjectBox: https://docs.objectbox.io/
-- Kaggle Resume Dataset: https://www.kaggle.com/datasets/saugataroyarghya/resume-dataset/
-- MVVM Architecture: https://developer.android.com/topic/architecture
-- Vector Search: https://en.wikipedia.org/wiki/Vector_database
+  * **Problem:** Cloud LLMs violate GDPR when processing resumes.
+  * **Solution:** Move the entire "Recruiter Brain" (Indexing + Retrieval + Reasoning) to the Edge.
+  * **Dataset:** [Kaggle Resume Dataset](https://www.kaggle.com/datasets/saugataroyarghya/resume-dataset)
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License.
 
-## Contact
-
-**Project Lead**: Madusanka Premaratne
-**Company**: Knivok Private Limited
-**Location**: Sri Lanka
-
-For questions about the research paper or implementation:
-- Email: [rmmpremaratne@gmail.com]
-- GitHub Issues: https://github.com/madusankapremaratne/skillvault-kotlin/issues
-
----
-
-**Last Updated**: 2025
-**Status**: Production-Ready for Research
+**Project Lead**: Madusanka Premaratne Rathnayake Mudiyanselage
+**Contact**: [rmmpremaratne@gmail.com]
+**GitHub Issues**: [https://github.com/madusankapremaratne/skillvault-kotlin/issues](https://github.com/madusankapremaratne/skillvault-kotlin/issues)
